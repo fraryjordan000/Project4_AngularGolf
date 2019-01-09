@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+// import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map';
 
 @Injectable({
@@ -13,7 +13,7 @@ export class ApiFetcherService {
   constructor(private http: HttpClient) {}
   private golfUrl = 'https://golf-courses-api.herokuapp.com/courses/';
 
-  getCourses(callback: Function) {
+  getCourses(callback: Function): any {
     let parent = this;
     this.http.get(this.golfUrl).subscribe(
       function(res) {
@@ -24,7 +24,7 @@ export class ApiFetcherService {
     return this.result;
   }
 
-  getCourseById(id: number, callback: Function) {
+  getCourseById(id: number, callback: Function): any {
     let parent = this;
     this.http.get(this.golfUrl + id).subscribe(
       function(res) {

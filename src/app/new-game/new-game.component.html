@@ -1,8 +1,35 @@
 
 <div id="new-game-container">
     <h1>Welcome</h1>
-    <div class="selection-box">
-        
-    </div>
-    <a routerLink="/game">Start Game</a>
+    <form #empForm="ngForm">
+        <section>
+            <mat-form-field>
+                <mat-select (selectionChange)="courseSelected($event)" placeholder="Select Course">
+                    <ng-container *ngIf="coursesRecieved">
+                            <mat-option *ngFor="let c of courses" value="{{c.id}}">{{c.name}}</mat-option>
+                    </ng-container>
+                </mat-select>
+            </mat-form-field>
+        </section>
+        <section>
+            <mat-form-field>
+                <mat-select (selectionChange)="teeSelected($event)" [value]="tee" placeholder="Select Tee">
+                    <ng-container *ngIf="courseRecieved">
+                            <mat-option *ngFor="let t of courseTees" value="{{t.teeType}}">{{t.teeType}}</mat-option>
+                    </ng-container>
+                </mat-select>
+            </mat-form-field>
+        </section>
+        <section>
+            <mat-form-field>
+                <mat-select (selectionChange)="playerNumSelected($event)" placeholder="Number of Players">
+                    <mat-option value="1">1</mat-option>
+                    <mat-option value="2">2</mat-option>
+                    <mat-option value="3">3</mat-option>
+                    <mat-option value="4">4</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </section>
+    </form>
+    <button mat-raised-button color="secondary" routerLink="/game" (click)="toGame()" [disabled]="!formComplete">Start Game</button>
 </div>
