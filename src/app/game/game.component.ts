@@ -18,10 +18,32 @@ export class GameComponent implements OnInit {
   }
 
   course: any;
+  courseId: number;
+  tee: string;
+  players: any;
 
-  players: any = [1, 2, 3, 4];
+  fireFetched: boolean = false;
+
+  holes: any = (()=>{
+    let tmp = [];
+    for(let i=1; i <= 18; i++) {
+      tmp.push(i);
+    }
+    return tmp;
+  })();
 
   ngOnInit() {
+    this.cardStats.valueChanges().subscribe(res => {
+      let tmp = JSON.parse(res);
+      this.courseId = tmp.course;
+      this.tee = tmp.tee;
+      this.players = tmp.players;
+      this.fireFetched = true;
+    });
+  }
+
+  genCardData() {
+    
   }
 
   async getCourseById(id: number, cb?: Function) {

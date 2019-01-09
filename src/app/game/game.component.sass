@@ -7,7 +7,6 @@
 
     #main-card
         display: flex
-        flex-direction: column
         width: 75%
         height: 75%
         padding: 1%
@@ -15,20 +14,35 @@
         background-color: #eeeffa
         opacity: 0.95
         border-radius: 5px
-
-        .horizontal
-            display: flex
-            flex-direction: row
         
         input
-            width: 50px
+            width: 1.3vw
             height: 25px
-            margin: 2px
+            margin-top: 5px
 
-            font-size: 1rem
+            font-size: 0.9rem
             text-align: center
+            outline-color: black
+            outline-width: 1px
+
+        .playerName
+            width: 5vw
         
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button
             -webkit-appearance: none
             margin: 0
+
+        .column
+            display: flex
+            flex-direction: column
+
+            margin: 0 1%
+
+            p
+                text-align: center
+                border-bottom: 1px solid #aaa
+                border-radius: 3px
+                padding-bottom: 2px
+            
+        

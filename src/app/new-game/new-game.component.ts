@@ -91,7 +91,13 @@ export class NewGameComponent implements OnInit {
     let tmp = {
       course: this.course.id,
       tee: this.tee,
-      playerNum: this.playerNum
+      players: (()=>{
+        let defaults = ["Player1", "Player2", "Player3", "Player4"];
+        for(let i=0; i < (4-this.playerNum); i++) {
+          defaults.pop();
+        }
+        return defaults;
+      })()
     };
     this.cardStats.set(JSON.stringify(tmp));
     this.cardData.set("");

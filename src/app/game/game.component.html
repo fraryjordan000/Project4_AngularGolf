@@ -1,11 +1,14 @@
 <div id="game-container">
   <div id="main-card">
-    <div id="players" class="horizontal">
-      <span *ngFor="let p of players">{{p}}</span>
-    </div>
-    <div id="holes" class="horizontal">
-      <input type="number">
-      <input type="number">
-    </div>
+    <ng-container *ngIf="fireFetched">
+        <div class="column">
+          <p>players</p>
+          <input *ngFor="let p of players" type="text" value="{{p}}" class="playerName">
+        </div>
+        <div *ngFor="let h of holes" class="column">
+          <p>{{h}}</p>
+          <input *ngFor="let p of players" type="number">
+        </div>
+    </ng-container>
   </div>
 </div>
