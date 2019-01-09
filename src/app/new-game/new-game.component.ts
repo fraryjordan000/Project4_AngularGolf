@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiFetcherService } from '../api-fetcher.service';
 import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-new-game',
@@ -95,6 +94,7 @@ export class NewGameComponent implements OnInit {
       playerNum: this.playerNum
     };
     this.cardStats.set(JSON.stringify(tmp));
+    this.cardData.set("");
   }
 
 }

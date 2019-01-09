@@ -1,3 +1,11 @@
-<p>
-  game works!
-</p>
+<div id="game-container">
+  <div id="main-card">
+    <div id="players" class="horizontal">
+      <span *ngFor="let p of players">{{p}}</span>
+    </div>
+    <div id="holes" class="horizontal">
+      <input type="number">
+      <input type="number">
+    </div>
+  </div>
+</div>
