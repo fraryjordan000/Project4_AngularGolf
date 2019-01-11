@@ -16,12 +16,14 @@ import {
 } from '@angular/material';
 import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
+import { NameCheckPipe } from './name-check.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
     NewGameComponent,
-    GameComponent
+    GameComponent,
+    NameCheckPipe
   ],
   imports: [
     BrowserModule,

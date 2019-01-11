@@ -24,33 +24,38 @@ export class GameComponent implements OnInit {
 
   statsFetched: boolean = false;
   dataFetched: boolean = false;
+  updated: boolean = true;
 
   holes: any;
   playerCount: any;
+
+  inputs: any = {};
 
   ngOnInit() {
     this.cardStats.valueChanges().subscribe(res => {
       let tmp1 = JSON.parse(res);
       this.courseId = tmp1.course;
-      this.getCourseById(tmp1.course, ()=>{
+      this.getCourseById(tmp1.course, () => {
         this.holes = this.course.holes;
       });
       this.tee = tmp1.tee;
       this.players = tmp1.players;
 
       let tmp2 = [];
-      for(let i=0; i<this.players.length; i++) {
+      for (let i = 0; i < this.players.length; i++) {
         tmp2.push(i);
       }
       this.playerCount = tmp2;
 
       this.statsFetched = true;
+
       this.cardData.valueChanges().subscribe(res => {
-        if(!this.dataFetched) {
-          if(res == "") {
+        if (!this.dataFetched) {
+          if (res == "") {
             this.saveData();
           } else {
             this.loadData(JSON.parse(res));
+            this.loadPlayers();
           }
           this.dataFetched = true;
         }
@@ -60,36 +65,64 @@ export class GameComponent implements OnInit {
 
   saveData() {
     let tmp = [];
-    for(let h in this.holes) {
-      for(let p of this.playerCount) {
-        tmp.push((<HTMLInputElement>document.getElementById(`h${this.holes[h].hole}p${p}`)).value);
+    for (let h in this.holes) {
+      for (let p of this.playerCount) {
+        tmp.push(this.inputs[`h${this.holes[h].hole}p${p}`] == null ? "" : this.inputs[`h${this.holes[h].hole}p${p}`]);
       }
     }
     this.cardData.set(JSON.stringify(tmp));
+    this.updatePlayers();
+  }
+
+  updatePlayers() {
+    this.updated = false;
+    this.cardStats.valueChanges().subscribe((res)=>{
+      if(!this.updated) {
+        let tmp1 = JSON.parse(res);
+        let tmp2 = [];
+        for(let p in this.playerCount) {
+          tmp2.push(this.inputs['p'+p]);
+        }
+        tmp1.players = tmp2;
+        this.cardStats.set(JSON.stringify(tmp1));
+      }
+    });
+  }
+
+  loadPlayers() {
+    let loop = setInterval(()=>{
+      for(let p in this.players) {
+        this.inputs['p'+p] = this.players[p];
+      }
+      if(this.inputs['p0'] != null) {
+        clearInterval(loop);
+      }
+    }, 10);
   }
 
   loadData(d: any) {
-    let p=0;
-    let h=1;
-    for(let i in d) {
-      if(p < (this.playerCount.length-1)) {
-        // (<HTMLInputElement>document.getElementById(`h${this.holes[h].hole}p${p}`)).setAttribute('value', d[i]);
-        p++;
-        continue;
+    let loop = setInterval(()=>{
+      let index = 0;
+      for (let h in this.holes) {
+        for (let p of this.playerCount) {
+          this.inputs[`h${this.holes[h].hole}p${p}`] = d[index];
+          index++;
+        }
       }
-      p = 0;
-      h++;
-    }
+      if(this.inputs[`h1p0`] != null) {
+        clearInterval(loop);
+      }
+    }, 10);
   }
 
   async getCourseById(id: number, cb?: Function) {
     let promise = new Promise((resolve, reject) => {
-      this.fetch.getCourseById(id, (res:any) => resolve(res.data));
+      this.fetch.getCourseById(id, (res: any) => resolve(res.data));
     });
 
     this.course = await promise;
 
-    if(cb != undefined) {
+    if (cb != undefined) {
       cb();
     }
   }

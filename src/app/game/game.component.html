@@ -3,12 +3,12 @@
     <ng-container *ngIf="statsFetched">
         <div class="column">
           <p>players</p>
-          <input *ngFor="let p of players" type="text" value="{{p}}" class="playerName">
-          <button style="margin-top: auto" mat-raised-button color="secondary" (click)="saveData()">Save Progress</button>
+          <input *ngFor="let p of playerCount" type="text" value="{{players[p]}}" [(ngModel)]="inputs['p'+p]" class="playerName">
+          <button style="margin-top: auto" mat-raised-button color="secondary" (click)="saveData()">Save Changes</button>
         </div>
         <div *ngFor="let h of holes" class="column">
           <p>{{h.hole}}</p>
-          <input id="h{{h.hole}}p{{p}}" *ngFor="let p of playerCount" type="number">
+          <input id="h{{h.hole}}p{{p}}" [(ngModel)]="inputs['h'+h.hole+'p'+p]" *ngFor="let p of playerCount" type="number">
         </div>
     </ng-container>
   </div>

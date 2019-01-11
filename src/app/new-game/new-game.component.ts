@@ -37,7 +37,6 @@ export class NewGameComponent implements OnInit {
         parent.coursesRecieved = true;
       }
     })();
-    this.cardStats.valueChanges().subscribe(res => console.log(JSON.parse(res)));
   }
 
   async getCourses() {
