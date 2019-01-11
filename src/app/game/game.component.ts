@@ -22,28 +22,64 @@ export class GameComponent implements OnInit {
   tee: string;
   players: any;
 
-  fireFetched: boolean = false;
+  statsFetched: boolean = false;
+  dataFetched: boolean = false;
 
-  holes: any = (()=>{
-    let tmp = [];
-    for(let i=1; i <= 18; i++) {
-      tmp.push(i);
-    }
-    return tmp;
-  })();
+  holes: any;
+  playerCount: any;
 
   ngOnInit() {
     this.cardStats.valueChanges().subscribe(res => {
-      let tmp = JSON.parse(res);
-      this.courseId = tmp.course;
-      this.tee = tmp.tee;
-      this.players = tmp.players;
-      this.fireFetched = true;
+      let tmp1 = JSON.parse(res);
+      this.courseId = tmp1.course;
+      this.getCourseById(tmp1.course, ()=>{
+        this.holes = this.course.holes;
+      });
+      this.tee = tmp1.tee;
+      this.players = tmp1.players;
+
+      let tmp2 = [];
+      for(let i=0; i<this.players.length; i++) {
+        tmp2.push(i);
+      }
+      this.playerCount = tmp2;
+
+      this.statsFetched = true;
+      this.cardData.valueChanges().subscribe(res => {
+        if(!this.dataFetched) {
+          if(res == "") {
+            this.saveData();
+          } else {
+            this.loadData(JSON.parse(res));
+          }
+          this.dataFetched = true;
+        }
+      });
     });
   }
 
-  genCardData() {
-    
+  saveData() {
+    let tmp = [];
+    for(let h in this.holes) {
+      for(let p of this.playerCount) {
+        tmp.push((<HTMLInputElement>document.getElementById(`h${this.holes[h].hole}p${p}`)).value);
+      }
+    }
+    this.cardData.set(JSON.stringify(tmp));
+  }
+
+  loadData(d: any) {
+    let p=0;
+    let h=1;
+    for(let i in d) {
+      if(p < (this.playerCount.length-1)) {
+        // (<HTMLInputElement>document.getElementById(`h${this.holes[h].hole}p${p}`)).setAttribute('value', d[i]);
+        p++;
+        continue;
+      }
+      p = 0;
+      h++;
+    }
   }
 
   async getCourseById(id: number, cb?: Function) {

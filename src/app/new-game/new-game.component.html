@@ -31,5 +31,8 @@
             </mat-form-field>
         </section>
     </form>
-    <button mat-raised-button color="secondary" routerLink="/game" (click)="toGame()" [disabled]="!formComplete">Start Game</button>
+    <div>
+        <button mat-raised-button color="secondary" routerLink="/game" (click)="toGame()" [disabled]="!formComplete">Start Game</button>
+        <button mat-raised-button color="secondary" routerLink="/game">Load Game</button>
+    </div>
 </div>

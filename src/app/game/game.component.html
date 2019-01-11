@@ -1,13 +1,14 @@
 <div id="game-container">
   <div id="main-card">
-    <ng-container *ngIf="fireFetched">
+    <ng-container *ngIf="statsFetched">
         <div class="column">
           <p>players</p>
           <input *ngFor="let p of players" type="text" value="{{p}}" class="playerName">
+          <button style="margin-top: auto" mat-raised-button color="secondary" (click)="saveData()">Save Progress</button>
         </div>
         <div *ngFor="let h of holes" class="column">
-          <p>{{h}}</p>
-          <input *ngFor="let p of players" type="number">
+          <p>{{h.hole}}</p>
+          <input id="h{{h.hole}}p{{p}}" *ngFor="let p of playerCount" type="number">
         </div>
     </ng-container>
   </div>
