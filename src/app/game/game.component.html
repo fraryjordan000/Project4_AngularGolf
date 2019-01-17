@@ -3,12 +3,32 @@
     <ng-container *ngIf="statsFetched">
         <div class="column">
           <p>players</p>
-          <input *ngFor="let p of playerCount" type="text" value="{{players[p]}}" [(ngModel)]="inputs['p'+p]" class="playerName">
+          <input *ngFor="let p of playerCount" type="text" value="{{tmpPlayers['p'+p] | nameCheck: tmpPlayers}}" [(ngModel)]="tmpPlayers['p'+p]" class="playerName">
+          <h4>Par</h4>
+          <h4>Yardage</h4>
+          <h4>Handicap</h4>
+
           <button style="margin-top: auto" mat-raised-button color="secondary" (click)="saveData()">Save Changes</button>
         </div>
         <div *ngFor="let h of holes" class="column">
           <p>{{h.hole}}</p>
-          <input id="h{{h.hole}}p{{p}}" [(ngModel)]="inputs['h'+h.hole+'p'+p]" *ngFor="let p of playerCount" type="number">
+          <input id="h{{h.hole}}p{{p}}" [(ngModel)]="inputs['h'+h.hole+'p'+p]" *ngFor="let p of playerCount" (ngModelChange)="calcNumbers(p)" type="number">
+          <h5 *ngIf="holeTeesLoaded">{{holeTees[h.hole-1].par}}</h5>
+          <h5 *ngIf="holeTeesLoaded">{{holeTees[h.hole-1].yards}}</h5>
+          <h5 *ngIf="holeTeesLoaded">{{holeTees[h.hole-1].hcp}}</h5>
+        </div>
+        <div class="column">
+          <p>Totals</p>
+          <span *ngFor="let p of playerCount">{{totals[p]}}</span>
+          <span>{{totalPar}}</span>
+        </div>
+        <div class="column">
+          <p>Ins</p>
+          <span *ngFor="let p of playerCount">{{ins[p]}}</span>
+        </div>
+        <div class="column">
+          <p>Outs</p>
+          <span *ngFor="let p of playerCount">{{outs[p]}}</span>
         </div>
     </ng-container>
   </div>

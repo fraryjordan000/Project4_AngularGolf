@@ -11,10 +11,12 @@ export class GameComponent implements OnInit {
 
   public cardStats: AngularFireObject<any>;
   public cardData: AngularFireObject<any>;
+  public cardPlayers: AngularFireObject<any>;
 
   constructor(private fetch: ApiFetcherService, private db: AngularFireDatabase) {
-    this.cardStats = db.object<any>('/cardStats/json');
-    this.cardData = this.db.object<any>('/cardData/json');
+    this.cardStats = this.db.object<any>('/cardStats');
+    this.cardData = this.db.object<any>('/cardData');
+    this.cardPlayers = this.db.object<any>('/cardStats/players');
   }
 
   course: any;
@@ -25,34 +27,53 @@ export class GameComponent implements OnInit {
   statsFetched: boolean = false;
   dataFetched: boolean = false;
   updated: boolean = true;
+  holeTeesLoaded: boolean = false;
 
   holes: any;
+  holeTees: any = [];
   playerCount: any;
 
   inputs: any = {};
+  tmpPlayers: any = {};
+
+  totals: any = [];
+  ins: any = [];
+  outs: any = [];
+  totalPar: number;
 
   ngOnInit() {
     this.cardStats.valueChanges().subscribe(res => {
-      let tmp1 = JSON.parse(res);
-      this.courseId = tmp1.course;
-      this.getCourseById(tmp1.course, () => {
+      this.courseId = res.course;
+      this.tee = res.tee;
+      this.players = res.players;
+      this.getCourseById(res.course, () => {
         this.holes = this.course.holes;
+        for(let h in this.holes) {
+          for(let t in this.holes[h].teeBoxes) {
+            if(this.holes[h].teeBoxes[t].teeType == this.tee) {
+              this.holeTees.push(this.holes[h].teeBoxes[t]);
+            }
+          }
+        }
+        this.totalPar = 0;
+    for(let t of this.holeTees) {
+      this.totalPar += t.par;
+    }
+        this.holeTeesLoaded = true;
       });
-      this.tee = tmp1.tee;
-      this.players = tmp1.players;
 
-      let tmp2 = [];
+      let tmp = [];
       for (let i = 0; i < this.players.length; i++) {
-        tmp2.push(i);
+        tmp.push(i);
       }
-      this.playerCount = tmp2;
+      this.playerCount = tmp;
 
       this.statsFetched = true;
 
       this.cardData.valueChanges().subscribe(res => {
         if (!this.dataFetched) {
           if (res == "") {
-            this.saveData();
+            this.saveData(true);
           } else {
             this.loadData(JSON.parse(res));
             this.loadPlayers();
@@ -63,7 +84,7 @@ export class GameComponent implements OnInit {
     });
   }
 
-  saveData() {
+  saveData(loadPlayers?: boolean) {
     let tmp = [];
     for (let h in this.holes) {
       for (let p of this.playerCount) {
@@ -71,20 +92,26 @@ export class GameComponent implements OnInit {
       }
     }
     this.cardData.set(JSON.stringify(tmp));
-    this.updatePlayers();
+    if(!loadPlayers && loadPlayers != undefined) {
+      this.updatePlayers();
+    } else {
+      this.loadPlayers();
+    }
   }
 
   updatePlayers() {
     this.updated = false;
     this.cardStats.valueChanges().subscribe((res)=>{
       if(!this.updated) {
-        let tmp1 = JSON.parse(res);
+        let tmp1 = res;
         let tmp2 = [];
         for(let p in this.playerCount) {
-          tmp2.push(this.inputs['p'+p]);
+          tmp2.push(this.tmpPlayers['p'+p]);
+          console.log(this.tmpPlayers['p'+p]);
         }
         tmp1.players = tmp2;
-        this.cardStats.set(JSON.stringify(tmp1));
+        this.cardPlayers.set(tmp1);
+        this.updated = true
       }
     });
   }
@@ -92,9 +119,9 @@ export class GameComponent implements OnInit {
   loadPlayers() {
     let loop = setInterval(()=>{
       for(let p in this.players) {
-        this.inputs['p'+p] = this.players[p];
+        this.tmpPlayers['p'+p] = this.players[p];
       }
-      if(this.inputs['p0'] != null) {
+      if(this.tmpPlayers['p0'] != null) {
         clearInterval(loop);
       }
     }, 10);
@@ -111,8 +138,26 @@ export class GameComponent implements OnInit {
       }
       if(this.inputs[`h1p0`] != null) {
         clearInterval(loop);
+        this.calcNumbers(0);
+        this.calcNumbers(1);
+        this.calcNumbers(2);
       }
     }, 10);
+  }
+
+  calcNumbers(player: any) {
+    this.totals[player] = 0;
+    this.ins[player] = 0;
+    this.outs[player] = 0;
+    for(let h in this.holes) {
+      let currentNum = parseInt(typeof(this.inputs[`h${h}p${player}`]) == "number" ? this.inputs[`h${h}p${player}`] : 0);
+      if(parseInt(h) <= 9) {
+        this.ins[player] += currentNum;
+      } else {
+        this.outs[player] += currentNum;
+      }
+      this.totals[player] += currentNum;
+    }
   }
 
   async getCourseById(id: number, cb?: Function) {

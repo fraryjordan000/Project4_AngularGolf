@@ -13,8 +13,8 @@ export class NewGameComponent implements OnInit {
   public cardData: AngularFireObject<any>;
 
   constructor(private fetch: ApiFetcherService, private db: AngularFireDatabase) {
-    this.cardStats = db.object<any>('/cardStats/json');
-    this.cardData = this.db.object<any>('/cardData/json');
+    this.cardStats = db.object<any>('/cardStats');
+    this.cardData = this.db.object<any>('/cardData');
   }
   
   courses: any;
@@ -90,15 +90,14 @@ export class NewGameComponent implements OnInit {
     let tmp = {
       course: this.course.id,
       tee: this.tee,
-      players: (()=>{
-        let defaults = ["Player1", "Player2", "Player3", "Player4"];
-        for(let i=0; i < (4-this.playerNum); i++) {
-          defaults.pop();
-        }
-        return defaults;
-      })()
+      players: []
     };
-    this.cardStats.set(JSON.stringify(tmp));
+    let defaults = ["Player1", "Player2", "Player3", "Player4"];
+    for(let i=0; i < (4-this.playerNum); i++) {
+      defaults.pop();
+    }
+    tmp.players = defaults;
+    this.cardStats.set(tmp);
     this.cardData.set("");
   }
 
