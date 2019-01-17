@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiFetcherService } from '../api-fetcher.service';
 import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
+import { NotifierService } from 'angular-notifier';
 
 @Component({
   selector: 'app-game',
@@ -13,10 +14,13 @@ export class GameComponent implements OnInit {
   public cardData: AngularFireObject<any>;
   public cardPlayers: AngularFireObject<any>;
 
-  constructor(private fetch: ApiFetcherService, private db: AngularFireDatabase) {
+  private readonly notifier: NotifierService;
+
+  constructor(private fetch: ApiFetcherService, private db: AngularFireDatabase, notifierService: NotifierService) {
     this.cardStats = this.db.object<any>('/cardStats');
     this.cardData = this.db.object<any>('/cardData');
     this.cardPlayers = this.db.object<any>('/cardStats/players');
+    this.notifier = notifierService;
   }
 
   course: any;
@@ -26,7 +30,6 @@ export class GameComponent implements OnInit {
 
   statsFetched: boolean = false;
   dataFetched: boolean = false;
-  updated: boolean = true;
   holeTeesLoaded: boolean = false;
 
   holes: any;
@@ -40,6 +43,7 @@ export class GameComponent implements OnInit {
   ins: any = [];
   outs: any = [];
   totalPar: number;
+  parScores: any = [];
 
   ngOnInit() {
     this.cardStats.valueChanges().subscribe(res => {
@@ -72,7 +76,7 @@ export class GameComponent implements OnInit {
 
       this.cardData.valueChanges().subscribe(res => {
         if (!this.dataFetched) {
-          if (res == "") {
+          if (res.length < 10) {
             this.saveData(true);
           } else {
             this.loadData(JSON.parse(res));
@@ -92,28 +96,19 @@ export class GameComponent implements OnInit {
       }
     }
     this.cardData.set(JSON.stringify(tmp));
-    if(!loadPlayers && loadPlayers != undefined) {
-      this.updatePlayers();
-    } else {
+    if(loadPlayers || loadPlayers != undefined) {
       this.loadPlayers();
+    } else {
+      this.updatePlayers();
     }
   }
 
   updatePlayers() {
-    this.updated = false;
-    this.cardStats.valueChanges().subscribe((res)=>{
-      if(!this.updated) {
-        let tmp1 = res;
-        let tmp2 = [];
-        for(let p in this.playerCount) {
-          tmp2.push(this.tmpPlayers['p'+p]);
-          console.log(this.tmpPlayers['p'+p]);
-        }
-        tmp1.players = tmp2;
-        this.cardPlayers.set(tmp1);
-        this.updated = true
-      }
-    });
+    this.players = [];
+    for(let p in this.playerCount) {
+      this.players.push(this.tmpPlayers['p'+p]);
+    }
+    this.cardPlayers.set(this.players);
   }
 
   loadPlayers() {
@@ -132,7 +127,7 @@ export class GameComponent implements OnInit {
       let index = 0;
       for (let h in this.holes) {
         for (let p of this.playerCount) {
-          this.inputs[`h${this.holes[h].hole}p${p}`] = d[index];
+          this.inputs[`h${this.holes[h].hole}p${p}`] = (d[index] == null) ? "" : d[index];
           index++;
         }
       }
@@ -141,22 +136,34 @@ export class GameComponent implements OnInit {
         this.calcNumbers(0);
         this.calcNumbers(1);
         this.calcNumbers(2);
+        this.calcNumbers(3);
       }
     }, 10);
   }
 
-  calcNumbers(player: any) {
+  calcNumbers(player: any, hole?: any) {
     this.totals[player] = 0;
     this.ins[player] = 0;
     this.outs[player] = 0;
-    for(let h in this.holes) {
+    for(let h=1; h <= this.holes.length; h++) {
       let currentNum = parseInt(typeof(this.inputs[`h${h}p${player}`]) == "number" ? this.inputs[`h${h}p${player}`] : 0);
-      if(parseInt(h) <= 9) {
+      if(h <= 9) {
         this.ins[player] += currentNum;
       } else {
         this.outs[player] += currentNum;
       }
       this.totals[player] += currentNum;
+    }
+    this.parScores[player] = this.totals[player] - this.totalPar;
+    if(hole == 18) {
+      let msg = `${this.players[player]} has a par score of ${this.parScores[player]}, `;
+      if(this.parScores[player] < 0) {
+        msg += "on to the PGA!";
+        this.notifier.notify('info', msg);
+      } else {
+        msg += "better luck next time!";
+        this.notifier.notify('warning', msg);
+      }
     }
   }
 

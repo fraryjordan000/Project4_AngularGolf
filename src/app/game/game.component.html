@@ -1,4 +1,13 @@
 <div id="game-container">
+  <div id="message-box">
+      <h1 id="message">
+        Golf Scorecard
+      </h1>
+      <div id="button-panel" style="margin-left: auto">
+        <button style="margin-top: auto" mat-raised-button color="secondary" (click)="saveData()">Save Changes</button>
+        <button style="margin-top: auto" mat-raised-button color="secondary" routerLink="/">Back To Menu</button>
+      </div>
+  </div>
   <div id="main-card">
     <ng-container *ngIf="statsFetched">
         <div class="column">
@@ -7,12 +16,10 @@
           <h4>Par</h4>
           <h4>Yardage</h4>
           <h4>Handicap</h4>
-
-          <button style="margin-top: auto" mat-raised-button color="secondary" (click)="saveData()">Save Changes</button>
         </div>
         <div *ngFor="let h of holes" class="column">
           <p>{{h.hole}}</p>
-          <input id="h{{h.hole}}p{{p}}" [(ngModel)]="inputs['h'+h.hole+'p'+p]" *ngFor="let p of playerCount" (ngModelChange)="calcNumbers(p)" type="number">
+          <input id="h{{h.hole}}p{{p}}" [(ngModel)]="inputs['h'+h.hole+'p'+p]" *ngFor="let p of playerCount" (ngModelChange)="calcNumbers(p, h.hole)" type="number">
           <h5 *ngIf="holeTeesLoaded">{{holeTees[h.hole-1].par}}</h5>
           <h5 *ngIf="holeTeesLoaded">{{holeTees[h.hole-1].yards}}</h5>
           <h5 *ngIf="holeTeesLoaded">{{holeTees[h.hole-1].hcp}}</h5>
@@ -32,4 +39,5 @@
         </div>
     </ng-container>
   </div>
+  <notifier-container></notifier-container>
 </div>

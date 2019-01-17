@@ -17,6 +17,7 @@ import {
 import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
 import { NameCheckPipe } from './name-check.pipe';
+import { NotifierModule } from 'angular-notifier';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,20 @@ import { NameCheckPipe } from './name-check.pipe';
     MatButtonModule,
     MatFormFieldModule,
     MatSelectModule,
-    FormsModule
+    FormsModule,
+    NotifierModule.withConfig({
+      position: {
+        horizontal: {
+          position: 'left',
+          distance: 12
+        },
+        vertical: {
+          position: 'top',
+
+          distance: 12
+        }
+      }
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]
